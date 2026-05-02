@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard · Tryger</title>
+
+<link rel="stylesheet" href="../shared/design-system.css" />
+<link rel="stylesheet" href="../shared/components.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+<style>
+.greeting-emoji { display: inline-block; font-size: 26px; margin: 0 6px; vertical-align: -2px; }
+.kpi-card-v2 { position: relative; padding: 22px; }
+.kpi-card-v2 .kpi-icon { margin-bottom: 18px; }
+.kpi-card-v2 .kpi-label { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+.kpi-card-v2 .kpi-value { font-size: 32px; }
+.lead-table-name { font-weight: var(--fw-semibold); }
+.commission-paid { color: var(--tryger-green-dark); font-weight: var(--fw-bold) !important; }
+.commission-pending { color: var(--text-faint); }
+@media (max-width: 1280px) { .dashboard-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+
+<body data-layout="agente"
+      data-active="dashboard"
+      data-crumb-section="Mi operación"
+      data-crumb-page="Dashboard">
+
+<div class="app">
+
+  <!-- ═══ SIDEBAR (inline) ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Tryger</div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Mi operación</div>
+      <a href="dashboard.html" class="nav-item" data-nav="dashboard">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="prospectos.html" class="nav-item" data-nav="prospectos">
+        <span class="material-symbols-outlined">group</span>
+        <span>Mis prospectos</span>
+      </a>
+      <a href="cotizador-paso-1.html" class="nav-item" data-nav="cotizador">
+        <span class="material-symbols-outlined">request_quote</span>
+        <span>Cotizador</span>
+      </a>
+      <a href="polizas.html" class="nav-item" data-nav="polizas">
+        <span class="material-symbols-outlined">shield</span>
+        <span>Mis pólizas</span>
+      </a>
+      <a href="comisiones.html" class="nav-item" data-nav="comisiones">
+        <span class="material-symbols-outlined">payments</span>
+        <span>Comisiones</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Recursos</div>
+      <a href="mi-codigo.html" class="nav-item" data-nav="mi-codigo">
+        <span class="material-symbols-outlined">qr_code_2</span>
+        <span>Mi código</span>
+      </a>
+      <a href="capacitacion.html" class="nav-item" data-nav="capacitacion">
+        <span class="material-symbols-outlined">school</span>
+        <span>Capacitación</span>
+      </a>
+      <a href="materiales.html" class="nav-item" data-nav="materiales">
+        <span class="material-symbols-outlined">download</span>
+        <span>Materiales</span>
+      </a>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="user-card">
+      <div class="user-avatar" data-user-initials>JP</div>
+      <div class="user-info">
+        <div class="user-name" data-user-name>Juan Pérez</div>
+        <div class="user-role" data-user-role>Agente · Activo</div>
+      </div>
+      <span class="material-symbols-outlined">unfold_more</span>
+    </div>
+
+    <div class="sidebar-pb">
+      <span>Powered by</span>
+      <span class="pb-mark">
+        <span class="pb-name">kinsu</span>
+        <span class="pb-chev">›</span>
+      </span>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+
+    <!-- ═══ TOPBAR (inline) ═══ -->
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span data-crumb-section>Mi operación</span>
+        <span class="material-symbols-outlined">chevron_right</span>
+        <span class="crumb-active" data-crumb-page>Dashboard</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="searchbox">
+        <span class="material-symbols-outlined">search</span>
+        <input placeholder="Buscar prospecto, cotización..." />
+        <span class="kbd">⌘K</span>
+      </div>
+      <button class="icon-btn" aria-label="Ayuda">
+        <span class="material-symbols-outlined">help</span>
+      </button>
+      <button class="icon-btn" aria-label="Notificaciones">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="dot-badge"></span>
+      </button>
+      <div class="topbar-divider"></div>
+      <div class="topbar-avatar" data-user-initials title="Mi cuenta">JP</div>
+    </div>
+
+    <!-- ═══ CONTENT ═══ -->
+    <div class="content">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">
+            Hola, <span data-user-firstname>Juan</span>
+            <span class="greeting-emoji">👋</span>
+            <span class="live-pulse">EN VIVO</span>
+          </h1>
+          <p class="page-subtitle">Aquí está el resumen de tu operación.</p>
+        </div>
+        <div class="page-actions">
+          <a class="btn btn-ghost" href="mi-codigo.html">
+            <span class="material-symbols-outlined">share</span>
+            Compartir mi código
+          </a>
+          <a class="btn btn-primary" href="cotizador-paso-1.html">
+            <span class="material-symbols-outlined">add</span>
+            Nueva cotización
+          </a>
+        </div>
+      </div>
+
+      <!-- KPI grid -->
+      <div class="kpi-grid" id="kpi-grid"></div>
+
+      <!-- Funnel + Activity -->
+      <div class="dashboard-row">
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Mi funnel de conversión</div></div>
+            <div class="tabs">
+              <span class="tab active">30 días</span>
+              <span class="tab">90 días</span>
+              <span class="tab">Año</span>
+            </div>
+          </div>
+          <div class="funnel" id="funnel"></div>
+          <div class="funnel-stats" id="funnel-stats"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Actividad reciente</div></div>
+          </div>
+          <div class="activity-feed" id="activity-feed"></div>
+        </div>
+      </div>
+
+      <!-- Leads table -->
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">Mis prospectos recientes</div></div>
+          <a href="prospectos.html" class="link-action">Ver todos</a>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Prospecto</th>
+                <th>Origen</th>
+                <th>Estatus</th>
+                <th class="num">Prima</th>
+                <th class="num">Comisión</th>
+                <th>Fecha</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <div>Mostrando <strong id="leads-count-shown">0</strong> de <strong id="leads-count-total">0</strong> prospectos</div>
+          <div class="pagination">
+            <a class="page-btn" href="#"><span class="material-symbols-outlined">chevron_left</span></a>
+            <a class="page-btn active" href="#">1</a>
+            <a class="page-btn" href="#">2</a>
+            <a class="page-btn" href="#">3</a>
+            <a class="page-btn" href="#"><span class="material-symbols-outlined">chevron_right</span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="../data/dummy.js"></script>
+<script src="../shared/utils.js"></script>
+<script src="../shared/auth.js"></script>
+<script src="../shared/api.js"></script>
+<script src="../shared/layout-loader.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  function setHTML(id, html) {
+    const el = document.getElementById(id);
+    if (!el) return false;
+    el.innerHTML = html;
+    return true;
+  }
+  function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function renderKPIs(kpis) {
+    const cards = [
+      { label: 'Prospectos este mes',    value: kpis.prospectosMes,                                     icon: 'group',         iconClass: 'blue'  },
+      { label: 'Cotizaciones generadas', value: kpis.cotizaciones,                                      icon: 'request_quote', iconClass: 'green' },
+      { label: 'Pólizas emitidas',       value: kpis.emitidas,                                          icon: 'shield',        iconClass: 'green' },
+      { label: 'Comisión acumulada',     value: TrygerUtils.money(kpis.comisionAcumulada, { decimals: 0 }), suffix: 'MXN', icon: 'payments', iconClass: 'cyan' }
+    ];
+    setHTML('kpi-grid', cards.map(c => `
+      <div class="kpi-card kpi-card-v2">
+        <div class="kpi-icon ${c.iconClass}"><span class="material-symbols-outlined">${c.icon}</span></div>
+        <div class="kpi-label">${c.label}</div>
+        <div class="kpi-value mono">${c.value}${c.suffix ? `<span class="suffix">${c.suffix}</span>` : ''}</div>
+      </div>
+    `).join(''));
+  }
+
+  function renderFunnel(f) {
+    const steps = [
+      { value: f.cotizaciones, label: 'Cotizaciones',       cls: 's1' },
+      { value: f.emitidas,     label: 'Pólizas emitidas',   cls: 's2' },
+      { value: f.pagadas,      label: 'Pólizas pagadas',    cls: 's3' },
+      { value: f.canceladas,   label: 'Pólizas canceladas', cls: 's4' }
+    ];
+    setHTML('funnel', steps.map(s => `
+      <div class="funnel-step ${s.cls}">
+        <div class="funnel-value mono">${s.value}</div>
+        <div class="funnel-label">${s.label}</div>
+      </div>
+    `).join(''));
+    setHTML('funnel-stats', `
+      <div class="funnel-stat">
+        <div class="funnel-stat-value mono">${f.conversionCotizacionesAEmitidas}%</div>
+        <div class="funnel-stat-label">% Conversión cotizaciones a emitidas</div>
+      </div>
+      <div class="funnel-stat">
+        <div class="funnel-stat-value mono">${f.conversionEmitidasAPagadas}%</div>
+        <div class="funnel-stat-label">% Conversión emitidas a pagadas</div>
+      </div>
+    `);
+  }
+
+  function renderActivity(items) {
+    const iconMap = { payment: 'payments', visit: 'forum', quote: 'request_quote', issued: 'shield', cancel: 'cancel' };
+    setHTML('activity-feed', items.map(it => `
+      <div class="activity-item">
+        <div class="activity-icon ${it.type}"><span class="material-symbols-outlined">${iconMap[it.type] || 'circle'}</span></div>
+        <div class="activity-body">
+          <div class="activity-text">${it.text}</div>
+          <div class="activity-meta">${TrygerUtils.relativeTime(it.when)}</div>
+        </div>
+      </div>
+    `).join(''));
+  }
+
+  function renderLeads(leads, total) {
+    setText('leads-count-shown', leads.length);
+    setText('leads-count-total', total);
+    setHTML('leads-tbody', leads.map(l => {
+      const initials = TrygerUtils.initials(l.nombre);
+      const status = TrygerUtils.statusLabel(l.estatus);
+      const origenBadge = l.origen === 'manual'
+        ? '<span class="badge badge-gray">Manual</span>'
+        : '<span class="badge badge-green">Mi código</span>';
+      const prima = l.prima ? TrygerUtils.money(l.prima) : '—';
+      const comision = l.comision
+        ? `<span class="commission-paid">${TrygerUtils.money(l.comision)}</span>`
+        : `<span class="commission-pending">—</span>`;
+      return `
+        <tr>
+          <td>
+            <div class="row-avatar">
+              <div class="row-avatar-circle">${initials}</div>
+              <div class="row-avatar-info">
+                <div class="row-avatar-name lead-table-name">${l.nombre}</div>
+                <div class="row-avatar-sub">${l.empresa || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td>${origenBadge}</td>
+          <td><span class="status-dot ${status.klass}">${status.label}</span></td>
+          <td class="num">${prima}</td>
+          <td class="num">${comision}</td>
+          <td>${TrygerUtils.shortDate(l.fecha)}</td>
+          <td><button class="row-action"><span class="material-symbols-outlined">more_vert</span></button></td>
+        </tr>
+      `;
+    }).join(''));
+  }
+
+  async function loadDashboard() {
+    try {
+      const session = TrygerAuth.getSession();
+      const firstName = (session && session.nombre ? session.nombre.split(' ')[0] : 'Agente');
+      document.querySelectorAll('[data-user-firstname]').forEach(el => el.textContent = firstName);
+
+      const result = await TrygerAPI.getAgentDashboard((session && session.agent_id) || 'AGT-001');
+      if (!result || !result.success) { console.error('[dashboard] Error:', result); return; }
+      const d = result.data;
+      if (d.kpis)        renderKPIs(d.kpis);
+      if (d.funnel)      renderFunnel(d.funnel);
+      if (d.activity)    renderActivity(d.activity);
+      if (d.recentLeads) renderLeads(d.recentLeads, d.totalLeads || d.recentLeads.length);
+    } catch (err) {
+      console.error('[dashboard] Excepción:', err);
+    }
+  }
+
+  document.addEventListener('layout:ready', loadDashboard);
+})();
+</script>
+</body>
+</html>
