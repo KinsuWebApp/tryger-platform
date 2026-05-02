@@ -1,0 +1,74 @@
+<!-- ═══════════════════════════════════════════════════════════════
+     SIDEBAR DEL AGENTE — parcial reutilizable
+     Inyectado por shared/layout-loader.js en cualquier página de /agente
+     Marca el item activo con la prop data-active del <body>:
+     <body data-active="dashboard">  →  marca el item "dashboard"
+     ═══════════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+
+  <!-- Logo -->
+  <div class="sidebar-logo">Tryger</div>
+
+  <!-- Sección: Mi operación -->
+  <div class="sidebar-section">
+    <div class="sidebar-label">Mi operación</div>
+    <a href="dashboard.html" class="nav-item" data-nav="dashboard">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="prospectos.html" class="nav-item" data-nav="prospectos">
+      <span class="material-symbols-outlined">group</span>
+      <span>Mis prospectos</span>
+    </a>
+    <a href="cotizador-paso-1.html" class="nav-item" data-nav="cotizador">
+      <span class="material-symbols-outlined">request_quote</span>
+      <span>Cotizador</span>
+    </a>
+    <a href="polizas.html" class="nav-item" data-nav="polizas">
+      <span class="material-symbols-outlined">shield</span>
+      <span>Mis pólizas</span>
+    </a>
+    <a href="comisiones.html" class="nav-item" data-nav="comisiones">
+      <span class="material-symbols-outlined">payments</span>
+      <span>Comisiones</span>
+    </a>
+  </div>
+
+  <!-- Sección: Recursos -->
+  <div class="sidebar-section">
+    <div class="sidebar-label">Recursos</div>
+    <a href="mi-codigo.html" class="nav-item" data-nav="mi-codigo">
+      <span class="material-symbols-outlined">qr_code_2</span>
+      <span>Mi código</span>
+    </a>
+    <a href="capacitacion.html" class="nav-item" data-nav="capacitacion">
+      <span class="material-symbols-outlined">school</span>
+      <span>Capacitación</span>
+    </a>
+    <a href="materiales.html" class="nav-item" data-nav="materiales">
+      <span class="material-symbols-outlined">download</span>
+      <span>Materiales</span>
+    </a>
+  </div>
+
+  <div class="sidebar-spacer"></div>
+
+  <!-- Card del usuario -->
+  <div class="user-card" data-user-card>
+    <div class="user-avatar" data-user-initials>JP</div>
+    <div class="user-info">
+      <div class="user-name" data-user-name>Juan Pérez</div>
+      <div class="user-role" data-user-role>Agente · Activo</div>
+    </div>
+    <span class="material-symbols-outlined">unfold_more</span>
+  </div>
+
+  <!-- Powered by Kinsu -->
+  <div class="sidebar-pb">
+    <span>Powered by</span>
+    <span class="pb-mark">
+      <span class="pb-name">kinsu</span>
+      <span class="pb-chev">›</span>
+    </span>
+  </div>
+</aside>

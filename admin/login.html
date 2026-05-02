@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login admin · Tryger</title>
+
+<link rel="stylesheet" href="../shared/design-system.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+<style>
+body {
+  background: var(--bg-app);
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.placeholder-card {
+  max-width: 480px;
+  width: 100%;
+  background: white;
+  border-radius: 18px;
+  padding: 48px 40px;
+  text-align: center;
+  border: 1px solid var(--border-light);
+}
+.placeholder-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(21,101,192,.10);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.placeholder-icon .material-symbols-outlined { font-size: 32px; color: var(--tryger-blue); }
+.placeholder-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -.4px; }
+.placeholder-sub { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+.placeholder-tag { display: inline-block; padding: 4px 10px; background: rgba(245,158,11,.14); color: #b07208; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 24px; }
+.back-link { color: var(--tryger-blue); font-size: 13px; font-weight: 600; }
+.back-link:hover { color: #1255a8; }
+</style>
+</head>
+
+<body>
+<div class="placeholder-card">
+  <div class="placeholder-icon">
+    <span class="material-symbols-outlined">admin_panel_settings</span>
+  </div>
+  <span class="placeholder-tag">Pendiente · Fase 5</span>
+  <h1 class="placeholder-title">Dashboard administrativo</h1>
+  <p class="placeholder-sub">
+    Aquí vivirá el panel del equipo de Tryger para validar la operación de cada agente,
+    cambiar estatus de pólizas, asignar comisiones, dar de alta nuevos agentes y editar
+    contenidos de capacitación y materiales.
+  </p>
+  <a href="../login.html" class="back-link">← Volver al login del agente</a>
+</div>
+</body>
+</html>

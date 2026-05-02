@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Iniciar sesión · Tryger</title>
+
+<link rel="stylesheet" href="shared/design-system.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+<style>
+.split { display: flex; min-height: 100dvh; }
+
+/* ── PANEL IZQUIERDO ── */
+.panel-l {
+  width: 52%;
+  flex-shrink: 0;
+  background: var(--tryger-navy);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 52px;
+  position: relative;
+  overflow: hidden;
+}
+.panel-l::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(21,101,192,.12) 1px, transparent 1px);
+  background-size: 26px 26px;
+  pointer-events: none;
+}
+.panel-l::after {
+  content: '';
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 440px; height: 440px;
+  background: radial-gradient(circle, rgba(21,101,192,.22) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.l-top { position: relative; z-index: 2; }
+.l-logo {
+  font-size: 28px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -.5px;
+}
+
+.l-center {
+  position: relative; z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+.l-headline {
+  font-size: 38px;
+  font-weight: 800;
+  color: white;
+  line-height: 1.15;
+  letter-spacing: -.8px;
+  text-align: center;
+  max-width: 480px;
+  margin-bottom: 20px;
+}
+.l-headline .accent { color: var(--tryger-green); }
+.l-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,.55);
+  text-align: center;
+  max-width: 420px;
+  line-height: 1.65;
+}
+
+.l-bottom {
+  position: relative; z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.l-copy {
+  font-size: 11px;
+  color: rgba(255,255,255,.25);
+  letter-spacing: .02em;
+}
+.powered-by {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255,255,255,.35);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+}
+.pb-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  text-transform: none;
+  letter-spacing: -.3px;
+}
+.pb-name { font-size: 14px; font-weight: 900; color: rgba(255,255,255,.78); }
+.pb-chev { font-size: 15px; font-weight: 200; color: var(--tryger-green); line-height: 1; margin-left: 1px; }
+
+/* ── PANEL DERECHO ── */
+.panel-r {
+  flex: 1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 52px 44px;
+  position: relative;
+}
+.panel-r::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(21,101,192,.04) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+.r-inner {
+  width: 100%;
+  max-width: 380px;
+  position: relative; z-index: 2;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  color: var(--tryger-blue);
+  margin-bottom: 8px;
+}
+.r-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--tryger-navy);
+  letter-spacing: -.5px;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.r-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+/* ── ERROR BANNER ── */
+.err-banner {
+  display: none;
+  margin-bottom: 16px;
+  padding: 11px 14px;
+  background: #fff0f0;
+  border: 1px solid #fca5a5;
+  border-radius: 12px;
+  font-size: 13px;
+  color: #b91c1c;
+  align-items: center;
+  gap: 8px;
+}
+.err-banner.show { display: flex; }
+
+/* ── FIELD ── */
+.f-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+}
+.f-wrap {
+  position: relative;
+  margin-bottom: 18px;
+}
+.f-icon-l {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  font-size: 18px;
+}
+.f-icon-r {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  font-size: 18px;
+  cursor: pointer;
+}
+.f-icon-r:hover { color: var(--text-secondary); }
+.f-inp {
+  width: 100%;
+  height: 46px;
+  padding: 12px 14px 12px 42px;
+  border: 1px solid var(--border-mid);
+  border-radius: 12px;
+  background: white;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+.f-inp:focus {
+  border-color: var(--tryger-blue);
+  box-shadow: 0 0 0 3px rgba(21,101,192,.1);
+}
+.f-inp.err {
+  border-color: var(--tryger-rose);
+  box-shadow: 0 0 0 3px rgba(212,81,109,.1);
+}
+
+.forgot-row { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+.forgot-btn {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.forgot-btn:hover { color: var(--tryger-blue); }
+
+.btn-primary {
+  width: 100%;
+  height: 46px;
+  background: var(--tryger-blue);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background .12s, transform .08s;
+}
+.btn-primary:hover { background: #1255a8; }
+.btn-primary:active { transform: scale(.99); }
+
+.demo-hint {
+  margin-top: 16px;
+  padding: 10px 12px;
+  background: rgba(130,209,75,.08);
+  border: 1px solid rgba(130,209,75,.2);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.demo-hint strong { color: var(--text-primary); font-weight: 600; }
+
+.terms {
+  font-size: 11px;
+  color: var(--text-faint);
+  text-align: center;
+  margin-top: 24px;
+  line-height: 1.5;
+}
+.terms a { color: var(--tryger-blue); cursor: pointer; }
+
+@media (max-width: 900px) {
+  .split { flex-direction: column; }
+  .panel-l { width: 100%; padding: 28px; }
+  .panel-l .l-center { padding: 30px 0; }
+  .l-headline { font-size: 26px; }
+  .panel-r { padding: 32px 24px; }
+}
+</style>
+</head>
+
+<body>
+<div class="split">
+
+  <!-- PANEL IZQUIERDO -->
+  <div class="panel-l">
+    <div class="l-top">
+      <div class="l-logo">Tryger</div>
+    </div>
+
+    <div class="l-center">
+      <h1 class="l-headline">
+        Aumenta tus ventas con una solución de <span class="accent">protección integral</span>
+      </h1>
+      <p class="l-sub">
+        Con Tryger, intermediarios y aseguradores ofrecen un servicio integral de protección logística de manera 100% digital.
+      </p>
+    </div>
+
+    <div class="l-bottom">
+      <div class="l-copy">© 2026 Tryger · Insurance Referrals</div>
+      <div class="powered-by">
+        <span>Powered by</span>
+        <span class="pb-mark">
+          <span class="pb-name">kinsu</span>
+          <span class="pb-chev">›</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="panel-r">
+    <div class="r-inner">
+
+      <p class="eyebrow">Portal del agente</p>
+      <h2 class="r-title">Bienvenido de vuelta</h2>
+      <p class="r-sub">Ingresa tus datos para continuar a tu panel.</p>
+
+      <div class="err-banner" id="err-banner">
+        <span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;">error</span>
+        <span id="err-msg">Correo o contraseña incorrectos. Intenta de nuevo.</span>
+      </div>
+
+      <label class="f-label" for="email">Correo electrónico</label>
+      <div class="f-wrap">
+        <span class="material-symbols-outlined f-icon-l">mail</span>
+        <input class="f-inp" id="email" type="email" placeholder="nombre@tryger.com" autocomplete="email" />
+      </div>
+
+      <label class="f-label" for="password">Contraseña</label>
+      <div class="f-wrap">
+        <span class="material-symbols-outlined f-icon-l">lock</span>
+        <input class="f-inp" id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+        <span class="material-symbols-outlined f-icon-r" id="eye-icon">visibility</span>
+      </div>
+
+      <div class="forgot-row">
+        <button class="forgot-btn" type="button">¿Olvidaste tu contraseña?</button>
+      </div>
+
+      <button class="btn-primary" id="btn-login" type="button">
+        <span id="btn-txt">Iniciar sesión</span>
+        <span class="material-symbols-outlined" id="btn-ico" style="font-size:18px;">arrow_forward</span>
+      </button>
+
+      <div class="demo-hint">
+        <span class="material-symbols-outlined" style="font-size:14px;color:var(--tryger-green);flex-shrink:0;">info</span>
+        Demo: <strong>juan.perez@tryger.com</strong> &nbsp;·&nbsp; contraseña <strong>1234</strong>
+      </div>
+
+      <p class="terms">
+        Al continuar aceptas los <a>Términos de uso</a> y la <a>Política de privacidad</a> de Tryger.
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="data/dummy.js"></script>
+<script src="shared/utils.js"></script>
+<script src="shared/auth.js"></script>
+<script src="shared/api.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+
+// Toggle visibility de la contraseña
+$('eye-icon').addEventListener('click', () => {
+  const p = $('password');
+  const ico = $('eye-icon');
+  const isHidden = p.type === 'password';
+  p.type = isHidden ? 'text' : 'password';
+  ico.textContent = isHidden ? 'visibility_off' : 'visibility';
+});
+
+// Submit con Enter
+['email', 'password'].forEach(id => {
+  $(id).addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
+// Botón
+$('btn-login').addEventListener('click', doLogin);
+
+async function doLogin() {
+  const emailEl = $('email');
+  const passEl = $('password');
+  const errBanner = $('err-banner');
+  const errMsg = $('err-msg');
+  const btn = $('btn-login');
+  const btnTxt = $('btn-txt');
+  const btnIco = $('btn-ico');
+
+  const email = emailEl.value.trim();
+  const pass = passEl.value.trim();
+
+  // Reset
+  errBanner.classList.remove('show');
+  emailEl.classList.remove('err');
+  passEl.classList.remove('err');
+
+  // Validación
+  if (!email) {
+    emailEl.classList.add('err');
+    emailEl.focus();
+    return;
+  }
+  if (!pass) {
+    passEl.classList.add('err');
+    passEl.focus();
+    return;
+  }
+
+  // Loading
+  btn.style.pointerEvents = 'none';
+  btn.style.opacity = '.72';
+  btnTxt.textContent = 'Verificando...';
+  btnIco.textContent = 'hourglass_empty';
+
+  function resetBtn() {
+    btn.style.pointerEvents = 'auto';
+    btn.style.opacity = '1';
+    btnTxt.textContent = 'Iniciar sesión';
+    btnIco.textContent = 'arrow_forward';
+  }
+
+  function showError(msg) {
+    resetBtn();
+    emailEl.classList.add('err');
+    passEl.classList.add('err');
+    errMsg.textContent = msg || 'Correo o contraseña incorrectos. Intenta de nuevo.';
+    errBanner.classList.add('show');
+    passEl.value = '';
+    passEl.focus();
+  }
+
+  try {
+    const result = await TrygerAPI.login(email, pass);
+    if (result && result.success && result.user) {
+      TrygerAuth.setSession(result.user);
+      window.location.href = 'agente/dashboard.html';
+    } else {
+      showError();
+    }
+  } catch (err) {
+    console.error(err);
+    showError('Hubo un problema al conectar. Intenta de nuevo en unos segundos.');
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cotiza tu seguro de transporte · Tryger</title>
+
+<link rel="stylesheet" href="../shared/design-system.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+<style>
+body {
+  background: var(--tryger-navy);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(circle, rgba(21,101,192,.10) 1px, transparent 1px);
+  background-size: 26px 26px;
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  top: -150px; right: -150px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(21,101,192,.18) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.public-header {
+  padding: 24px 40px;
+  position: relative; z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.public-logo { font-size: 24px; font-weight: 800; color: white; letter-spacing: -.5px; }
+.public-help { color: rgba(255,255,255,.6); font-size: 13px; }
+.public-help:hover { color: white; }
+
+.public-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  position: relative; z-index: 2;
+}
+
+.hero {
+  text-align: center;
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+.hero h1 {
+  font-size: 44px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -.8px;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.hero h1 .accent { color: var(--tryger-green); }
+.hero p {
+  font-size: 16px;
+  color: rgba(255,255,255,.65);
+  line-height: 1.6;
+}
+
+.code-card {
+  width: 100%;
+  max-width: 480px;
+  background: white;
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.code-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  color: var(--tryger-blue);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.code-eyebrow .material-symbols-outlined { font-size: 14px; }
+
+.code-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--tryger-navy);
+  letter-spacing: -.4px;
+  margin-bottom: 6px;
+}
+.code-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.code-input-wrap { position: relative; margin-bottom: 16px; }
+.code-input {
+  width: 100%;
+  height: 56px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border-mid);
+  border-radius: 14px;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-align: center;
+  text-transform: uppercase;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.code-input:focus {
+  border-color: var(--tryger-blue);
+  box-shadow: 0 0 0 3px rgba(21,101,192,.1);
+}
+.code-helper {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 20px;
+}
+.code-helper a { color: var(--tryger-blue); cursor: pointer; }
+
+.btn-cta {
+  width: 100%;
+  height: 52px;
+  background: var(--tryger-blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.btn-cta:hover { background: #1255a8; }
+.btn-cta .material-symbols-outlined { font-size: 20px; }
+
+.public-footer {
+  padding: 20px 40px;
+  position: relative; z-index: 2;
+  font-size: 11px;
+  color: rgba(255,255,255,.35);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.public-footer .powered-by {
+  display: flex; align-items: center; gap: 6px;
+  text-transform: uppercase; letter-spacing: .14em;
+}
+.public-footer .pb-name { font-weight: 900; font-size: 12px; color: rgba(255,255,255,.7); text-transform: none; letter-spacing: -.3px; }
+.public-footer .pb-chev { color: var(--tryger-green); font-weight: 200; font-size: 13px; margin-left: 1px; }
+
+.placeholder-tag {
+  position: fixed;
+  top: 80px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  padding: 6px 14px;
+  background: rgba(245,158,11,.18);
+  color: #f59e0b;
+  border: 1px solid rgba(245,158,11,.4);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 30px; }
+  .hero p { font-size: 14px; }
+  .code-card { padding: 24px; }
+  .public-header, .public-footer { padding: 18px 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="placeholder-tag">Pendiente · Fase 4</div>
+
+<header class="public-header">
+  <div class="public-logo">Tryger</div>
+  <a class="public-help" href="#">¿Necesitas ayuda?</a>
+</header>
+
+<main class="public-main">
+
+  <div class="hero">
+    <h1>Asegura tu carga en <span class="accent">menos de 5 minutos</span></h1>
+    <p>Cotiza protección integral para tu próximo viaje. Captura el código de tu agente y obtén tu cotización al instante.</p>
+  </div>
+
+  <div class="code-card">
+    <div class="code-eyebrow">
+      <span class="material-symbols-outlined">badge</span>
+      Comencemos
+    </div>
+    <h2 class="code-title">Captura el código de tu agente</h2>
+    <p class="code-sub">Tu agente te compartió un código de 6 caracteres. Captúralo aquí para vincularte con él.</p>
+
+    <div class="code-input-wrap">
+      <input class="code-input" id="code-input" placeholder="JP-1024" maxlength="7" />
+    </div>
+    <p class="code-helper">
+      <a id="no-code-link">¿No tienes código?</a> Continúa sin él y te asignaremos un asesor.
+    </p>
+
+    <button class="btn-cta" id="btn-continue">
+      Comenzar cotización
+      <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
+  </div>
+</main>
+
+<footer class="public-footer">
+  <div>© 2026 Tryger · Insurance Referrals</div>
+  <div class="powered-by">
+    <span>Powered by</span>
+    <span class="pb-name">kinsu</span>
+    <span class="pb-chev">›</span>
+  </div>
+</footer>
+
+<script src="../data/dummy.js"></script>
+<script src="../shared/utils.js"></script>
+<script src="../shared/api.js"></script>
+<script>
+const codeInput = document.getElementById('code-input');
+const btnContinue = document.getElementById('btn-continue');
+const noCodeLink = document.getElementById('no-code-link');
+
+// Auto-mayúsculas y formato XX-NNNN
+codeInput.addEventListener('input', (e) => {
+  let v = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  // Insertar guion automático después de 2 letras si no hay
+  if (v.length === 2 && !v.includes('-')) v = v + '-';
+  e.target.value = v;
+});
+
+codeInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') btnContinue.click();
+});
+
+btnContinue.addEventListener('click', async () => {
+  const code = TrygerUtils.normalizeAgentCode(codeInput.value);
+  if (code && !TrygerUtils.isValidAgentCode(code)) {
+    alert('Código inválido. Debe tener formato XX-NNNN (ej: JP-1024).\n\nEsta pantalla aún no está construida — vendrá en la Fase 4.');
+    return;
+  }
+  alert('Pantalla pendiente · Fase 4.\n\nEn la versión final, aquí avanzas al wizard de cotización con código: ' + (code || 'sin código (agente house)'));
+});
+
+noCodeLink.addEventListener('click', () => {
+  codeInput.value = '';
+  alert('Continuar sin código asignará tu lead al equipo house de Tryger.\n\nEsta pantalla aún no está construida — vendrá en la Fase 4.');
+});
+</script>
+
+</body>
+</html>
