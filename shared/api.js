@@ -9,7 +9,7 @@
 
   // ⚠️ CUANDO TENGAS PUBLICADO EL APPS SCRIPT, PEGA AQUÍ LA URL DEL WEB APP.
   // Mientras esté vacío, todas las llamadas devuelven datos dummy.
-  const APPS_SCRIPT_URL = '';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzl2AC_Yi8gUMEdIrb6xr3Vr4JRpo0uBk6WsNGz68vb09dAVijVIWdWV_NGX16xJNmfIg/exec';
 
   const isLive = () => APPS_SCRIPT_URL && APPS_SCRIPT_URL.length > 10;
 
