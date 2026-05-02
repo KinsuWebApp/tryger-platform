@@ -1,19 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
-   TRYGER · LAYOUT LOADER (v3)
-
-   Inyecta sidebar y topbar dinámicamente en cada página interna.
-   Siempre dispara el evento `layout:ready`, incluso si algo falla,
-   para que el resto de la página pueda continuar.
-
-   Uso:
-     <body data-layout="agente" data-active="dashboard"
-           data-crumb-section="Mi operación" data-crumb-page="Dashboard">
-       <div data-slot="sidebar"></div>
-       ...
-       <div data-slot="topbar"></div>
-       ...
-     </body>
-     <script src="../shared/layout-loader.js"></script>
+   TRYGER · LAYOUT LOADER (v4)
+   Inyecta sidebar y topbar reemplazando el slot manualmente
+   con replaceChild (más seguro y predecible que outerHTML).
    ═══════════════════════════════════════════════════════════════ */
 
 (function() {
@@ -37,26 +25,40 @@
 
   const SHARED_BASE = getSharedBase();
 
-  // Inyecta el contenido del partial reemplazando el div del slot.
-  // Usa outerHTML (confiable en navegadores modernos).
+  // Convierte un string de HTML en el primer elemento real.
+  function htmlToElement(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = (html || '').trim();
+    // Devolver el primer elemento (ignora texto y comentarios)
+    return tmp.firstElementChild;
+  }
+
   async function injectPartial(slotName, partialFile) {
-    const slot = document.querySelector(`[data-slot="${slotName}"]`);
+    const slot = document.querySelector('[data-slot="' + slotName + '"]');
     if (!slot) {
-      console.warn(`[layout] Slot no encontrado: ${slotName}`);
+      console.warn('[layout] Slot no encontrado: ' + slotName);
+      return false;
+    }
+    if (!slot.parentNode) {
+      console.warn('[layout] Slot sin parent: ' + slotName);
       return false;
     }
 
     try {
       const url = SHARED_BASE + partialFile;
       const res = await fetch(url, { cache: 'no-cache' });
-      if (!res.ok) throw new Error(`HTTP ${res.status} al cargar ${url}`);
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' al cargar ' + url);
       const html = await res.text();
-      slot.outerHTML = html;
+      const el = htmlToElement(html);
+      if (!el) throw new Error('Partial vacío o malformado: ' + partialFile);
+
+      // Reemplazo seguro
+      slot.parentNode.replaceChild(el, slot);
       return true;
     } catch (err) {
-      console.error(`[layout] No se pudo inyectar ${partialFile}:`, err);
+      console.error('[layout] No se pudo inyectar ' + partialFile + ':', err);
       try {
-        slot.innerHTML = '<div style="padding:14px;color:#b91c1c;font-size:12px;">Error al cargar ' + partialFile + '. Revisa la consola.</div>';
+        slot.innerHTML = '<div style="padding:14px;color:#b91c1c;font-size:12px;">Error al cargar ' + partialFile + '.</div>';
       } catch (e) { /* ignore */ }
       return false;
     }
@@ -100,7 +102,7 @@
     }
 
     const initials = user.initials ||
-      (user.nombre || 'U').split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase();
+      (user.nombre || 'U').split(' ').filter(Boolean).map(function(n) { return n[0]; }).join('').slice(0, 2).toUpperCase();
 
     document.querySelectorAll('[data-user-initials]').forEach(function(el) { el.textContent = initials; });
     document.querySelectorAll('[data-user-name]').forEach(function(el) { el.textContent = user.nombre || 'Usuario'; });
@@ -124,17 +126,13 @@
     } catch (err) {
       console.error('[layout] Error inesperado:', err);
     } finally {
-      // Siempre disparar — aún si algo falló, deja que el resto del page corra.
       document.dispatchEvent(new CustomEvent('layout:ready'));
     }
   }
 
-  // Si DOMContentLoaded ya pasó, ejecutar de inmediato.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootstrapLayout);
   } else {
-    // El DOM ya está parseado — arrancar en el siguiente tick para que los listeners
-    // de layout:ready en otros scripts inline se registren primero.
     setTimeout(bootstrapLayout, 0);
   }
 
