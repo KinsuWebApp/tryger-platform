@@ -316,6 +316,29 @@
         comision_estimada: Math.round(primaCalculada * 0.10),
         validez_dias: 7
       };
+    },
+
+    async createLeadAndQuote(data) {
+      await delay(500);
+      const leadId = `LEAD-${String(LEADS.length + 1).padStart(4, '0')}`;
+      const quoteId = `COT-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
+      const valorCarga = Number(data.valor_carga) || 0;
+      const km = Number(data.kilometros) || 0;
+      const primaCalculada = Math.max(2000, valorCarga * 0.01 + km * 0.5);
+      return {
+        success: true,
+        lead_id: leadId,
+        cotizacion_id: quoteId,
+        prima_calculada: Math.round(primaCalculada),
+        comision_estimada: Math.round(primaCalculada * 0.10),
+        validez_dias: 7
+      };
+    },
+
+    async submitQuoteForReview({ quoteId }) {
+      await delay(300);
+      const polizaId = `POL-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
+      return { success: true, poliza_id: polizaId, cotizacion_id: quoteId, estatus: 'en_revision' };
     }
   };
 
