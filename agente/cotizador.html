@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cotizador · Tryger</title>
+
+<link rel="stylesheet" href="../shared/design-system.css" />
+<link rel="stylesheet" href="../shared/components.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+<style>
+.section-card { margin-bottom: 20px; }
+.section-card .section-head {
+  padding: 18px 22px 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--tryger-blue);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.section-card .section-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -.2px;
+}
+.section-card .section-sub {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  padding: 0 22px 14px 58px;
+  margin-top: -2px;
+}
+.section-card .section-body { padding: 0 22px 22px; }
+
+.result-card {
+  background: linear-gradient(135deg, #0d1c2e 0%, #1565c0 100%);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.result-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px);
+  background-size: 18px 18px;
+  pointer-events: none;
+}
+.result-eyebrow {
+  position: relative; z-index: 2;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  color: var(--tryger-green);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.result-eyebrow .material-symbols-outlined {
+  font-size: 16px;
+}
+.result-title {
+  position: relative; z-index: 2;
+  font-size: 18px;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 8px;
+}
+.result-prima {
+  position: relative; z-index: 2;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.result-prima .currency {
+  font-size: 24px;
+  font-weight: 600;
+  margin-left: 6px;
+  color: rgba(255,255,255,.6);
+}
+.result-meta {
+  position: relative; z-index: 2;
+  display: flex; gap: 32px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.result-meta-item .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: rgba(255,255,255,.5);
+  margin-bottom: 4px;
+}
+.result-meta-item .value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+}
+
+.actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.actions-row .btn { height: 46px; padding: 0 20px; font-size: 14px; }
+
+.summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; padding-top: 16px; }
+.summary-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
+.summary-item:last-child, .summary-item:nth-last-child(2) { border-bottom: none; }
+.summary-label { font-size: 12px; color: var(--text-muted); }
+.summary-value { font-size: 13px; font-weight: 600; color: var(--text-primary); text-align: right; }
+
+.pre-result-msg {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.pre-result-msg .material-symbols-outlined {
+  font-size: 36px;
+  display: block;
+  margin: 0 auto 12px;
+  color: var(--text-faint);
+}
+
+.success-banner {
+  background: rgba(130,209,75,.10);
+  border: 1px solid rgba(130,209,75,.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--tryger-green-dark);
+}
+.success-banner .material-symbols-outlined { font-size: 22px; flex-shrink: 0; }
+.success-banner strong { font-weight: 700; }
+
+.error-banner {
+  background: #fff0f0;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #b91c1c;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.error-banner .material-symbols-outlined { font-size: 18px; flex-shrink: 0; }
+
+/* Layout del cotizador (form + resultado) */
+.cotizador-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* En tablet/mobile: form arriba, resultado abajo (apilado) */
+@media (max-width: 1024px) {
+  .cotizador-layout {
+    grid-template-columns: 1fr;
+  }
+  /* El resultado va arriba en mobile cuando ya hay datos calculados */
+  .cotizador-layout #result-column.has-result {
+    order: -1;
+    position: sticky;
+    top: 80px;
+    z-index: 5;
+  }
+}
+
+@media (max-width: 720px) {
+  .result-prima { font-size: 40px; }
+  .summary-row { grid-template-columns: 1fr; }
+  .result-card { padding: 24px 20px; }
+  .section-card .section-head { padding: 16px 18px 4px; }
+  .section-card .section-sub { padding: 0 18px 12px 50px; font-size: 12px; }
+  .section-card .section-body { padding: 0 18px 18px; }
+  .result-meta { gap: 24px; }
+}
+
+@media (max-width: 480px) {
+  .cotizador-layout #result-column.has-result {
+    position: static;
+  }
+  .result-prima { font-size: 34px; }
+  .result-prima .currency { font-size: 18px; }
+  .result-meta { gap: 18px; }
+  .section-num { width: 24px; height: 24px; font-size: 11px; }
+  .section-card .section-title { font-size: 15px; }
+}
+</style>
+</head>
+
+<body data-layout="agente"
+      data-active="cotizador"
+      data-crumb-section="Mi operación"
+      data-crumb-page="Cotizador">
+
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Tryger</div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Mi operación</div>
+      <a href="dashboard.html" class="nav-item" data-nav="dashboard">
+        <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
+      </a>
+      <a href="prospectos.html" class="nav-item" data-nav="prospectos">
+        <span class="material-symbols-outlined">group</span><span>Mis prospectos</span>
+      </a>
+      <a href="cotizador.html" class="nav-item" data-nav="cotizador">
+        <span class="material-symbols-outlined">request_quote</span><span>Cotizador</span>
+      </a>
+      <a href="polizas.html" class="nav-item" data-nav="polizas">
+        <span class="material-symbols-outlined">shield</span><span>Mis pólizas</span>
+      </a>
+      <a href="comisiones.html" class="nav-item" data-nav="comisiones">
+        <span class="material-symbols-outlined">payments</span><span>Comisiones</span>
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Recursos</div>
+      <a href="mi-codigo.html" class="nav-item" data-nav="mi-codigo">
+        <span class="material-symbols-outlined">qr_code_2</span><span>Mi código</span>
+      </a>
+      <a href="capacitacion.html" class="nav-item" data-nav="capacitacion">
+        <span class="material-symbols-outlined">school</span><span>Capacitación</span>
+      </a>
+      <a href="materiales.html" class="nav-item" data-nav="materiales">
+        <span class="material-symbols-outlined">download</span><span>Materiales</span>
+      </a>
+    </div>
+    <div class="sidebar-spacer"></div>
+    <div class="user-card">
+      <div class="user-avatar" data-user-initials>JP</div>
+      <div class="user-info">
+        <div class="user-name" data-user-name>Juan Pérez</div>
+        <div class="user-role" data-user-role>Agente · Activo</div>
+      </div>
+      <span class="material-symbols-outlined">unfold_more</span>
+    </div>
+    <div class="sidebar-pb">
+      <span>Powered by</span>
+      <span class="pb-mark">
+        <span class="pb-name">kinsu</span>
+        <span class="pb-chev">›</span>
+      </span>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span data-crumb-section>Mi operación</span>
+        <span class="material-symbols-outlined">chevron_right</span>
+        <span class="crumb-active" data-crumb-page>Cotizador</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="searchbox">
+        <span class="material-symbols-outlined">search</span>
+        <input placeholder="Buscar prospecto, cotización..." />
+        <span class="kbd">⌘K</span>
+      </div>
+      <button class="icon-btn" aria-label="Ayuda">
+        <span class="material-symbols-outlined">help</span>
+      </button>
+      <button class="icon-btn" aria-label="Notificaciones">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="dot-badge"></span>
+      </button>
+      <div class="topbar-divider"></div>
+      <div class="topbar-avatar" data-user-initials title="Mi cuenta">JP</div>
+    </div>
+
+    <div class="content">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Nueva cotización</h1>
+          <p class="page-subtitle">Captura los datos del prospecto y de su viaje. La prima se calcula al instante.</p>
+        </div>
+      </div>
+
+      <div id="success-area"></div>
+
+      <div class="cotizador-layout" id="layout-grid">
+
+        <!-- COLUMNA IZQUIERDA: FORM -->
+        <div>
+
+          <!-- SECCIÓN 1: Prospecto -->
+          <div class="card section-card">
+            <div class="section-head">
+              <div class="section-num">1</div>
+              <div class="section-title">Datos del prospecto</div>
+            </div>
+            <div class="section-sub">¿A quién le estás cotizando?</div>
+            <div class="section-body">
+              <div class="form-grid-2">
+                <div class="form-group form-row-full">
+                  <label class="form-label">Nombre completo <span class="req">*</span></label>
+                  <input type="text" class="form-input" id="f-nombre" placeholder="Ej. Carlos Ramírez" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Teléfono <span class="req">*</span></label>
+                  <input type="tel" class="form-input" id="f-telefono" placeholder="10 dígitos" maxlength="10" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email <span class="opt">(opcional)</span></label>
+                  <input type="email" class="form-input" id="f-email" placeholder="correo@ejemplo.com" />
+                </div>
+                <div class="form-group form-row-full">
+                  <label class="form-label">Empresa <span class="opt">(opcional)</span></label>
+                  <input type="text" class="form-input" id="f-empresa" placeholder="Razón social o 'Personal'" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 2: Trayecto -->
+          <div class="card section-card">
+            <div class="section-head">
+              <div class="section-num">2</div>
+              <div class="section-title">Trayecto del viaje</div>
+            </div>
+            <div class="section-sub">Origen, destino y duración del viaje a asegurar.</div>
+            <div class="section-body">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label">Origen <span class="req">*</span></label>
+                  <input type="text" class="form-input" id="f-origen" placeholder="Ej. CDMX" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Destino <span class="req">*</span></label>
+                  <input type="text" class="form-input" id="f-destino" placeholder="Ej. Guadalajara" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Kilómetros estimados <span class="req">*</span></label>
+                  <input type="number" class="form-input" id="f-km" placeholder="Ej. 540" min="1" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Duración (horas) <span class="opt">(opcional)</span></label>
+                  <input type="number" class="form-input" id="f-duracion" placeholder="Ej. 8" min="0" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Fecha de inicio <span class="req">*</span></label>
+                  <input type="date" class="form-input" id="f-fecha-inicio" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Fecha de fin <span class="req">*</span></label>
+                  <input type="date" class="form-input" id="f-fecha-fin" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 3: Vehículo y carga -->
+          <div class="card section-card">
+            <div class="section-head">
+              <div class="section-num">3</div>
+              <div class="section-title">Vehículo y carga</div>
+            </div>
+            <div class="section-sub">Qué se transporta y en qué tipo de vehículo.</div>
+            <div class="section-body">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label">Tipo de vehículo <span class="req">*</span></label>
+                  <select class="form-select" id="f-vehiculo">
+                    <option value="">Selecciona...</option>
+                    <option value="tractocamion">Tractocamión</option>
+                    <option value="caja_seca">Caja seca</option>
+                    <option value="plataforma">Plataforma</option>
+                    <option value="camioneta">Camioneta</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tipo de mercancía <span class="req">*</span></label>
+                  <select class="form-select" id="f-mercancia">
+                    <option value="">Selecciona...</option>
+                    <option value="maquinaria">Maquinaria</option>
+                    <option value="electronica">Electrónica</option>
+                    <option value="alimentos">Alimentos</option>
+                    <option value="textiles">Textiles</option>
+                    <option value="quimicos">Químicos</option>
+                    <option value="materiales_construccion">Materiales de construcción</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                </div>
+                <div class="form-group form-row-full">
+                  <label class="form-label">Descripción de la carga <span class="opt">(opcional)</span></label>
+                  <textarea class="form-textarea" id="f-descripcion" placeholder="Ej. 5 toneladas de maíz a granel" rows="2"></textarea>
+                </div>
+                <div class="form-group form-row-full">
+                  <label class="form-label">Valor de la carga (MXN) <span class="req">*</span></label>
+                  <input type="number" class="form-input" id="f-valor" placeholder="Ej. 850000" min="1" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ERROR Y BOTONES -->
+          <div id="error-area"></div>
+
+          <div style="display: flex; gap: 12px; margin-top: 8px;">
+            <button class="btn btn-ghost" id="btn-clear" type="button">
+              <span class="material-symbols-outlined">refresh</span>
+              Limpiar
+            </button>
+            <button class="btn btn-primary" id="btn-cotizar" type="button" style="flex: 1;">
+              <span class="material-symbols-outlined">calculate</span>
+              <span id="btn-cotizar-txt">Calcular cotización</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: RESULTADO -->
+        <div id="result-column">
+          <div class="card section-card" id="result-empty">
+            <div class="pre-result-msg">
+              <span class="material-symbols-outlined">request_quote</span>
+              <strong>Captura los datos del viaje</strong><br>
+              y aquí aparecerá la prima calculada y el resumen.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="../data/dummy.js"></script>
+<script src="../shared/utils.js"></script>
+<script src="../shared/auth.js"></script>
+<script src="../shared/api.js"></script>
+<script src="../shared/layout-loader.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  let lastQuoteResult = null;
+
+  // ─── Validación y captura ───
+  function getFormData() {
+    return {
+      nombre_prospecto: $('f-nombre').value.trim(),
+      telefono:         $('f-telefono').value.trim(),
+      email:            $('f-email').value.trim(),
+      empresa:          $('f-empresa').value.trim(),
+      origen_viaje:     $('f-origen').value.trim(),
+      destino_viaje:    $('f-destino').value.trim(),
+      kilometros:       $('f-km').value,
+      duracion_horas:   $('f-duracion').value,
+      fecha_inicio_viaje: $('f-fecha-inicio').value,
+      fecha_fin_viaje:    $('f-fecha-fin').value,
+      tipo_vehiculo:    $('f-vehiculo').value,
+      tipo_carga:       $('f-mercancia').value,
+      descripcion_carga: $('f-descripcion').value.trim(),
+      valor_carga:      $('f-valor').value
+    };
+  }
+
+  function validateForm(data) {
+    const errors = [];
+    const required = {
+      nombre_prospecto: 'Nombre del prospecto',
+      telefono: 'Teléfono',
+      origen_viaje: 'Origen del viaje',
+      destino_viaje: 'Destino del viaje',
+      kilometros: 'Kilómetros',
+      fecha_inicio_viaje: 'Fecha de inicio',
+      fecha_fin_viaje: 'Fecha de fin',
+      tipo_vehiculo: 'Tipo de vehículo',
+      tipo_carga: 'Tipo de mercancía',
+      valor_carga: 'Valor de la carga'
+    };
+    Object.keys(required).forEach(k => {
+      if (!data[k] || String(data[k]).trim() === '') {
+        errors.push('Falta: ' + required[k]);
+      }
+    });
+    if (data.telefono && !/^\d{10}$/.test(data.telefono)) {
+      errors.push('Teléfono debe tener 10 dígitos');
+    }
+    if (data.kilometros && Number(data.kilometros) <= 0) {
+      errors.push('Kilómetros debe ser mayor a 0');
+    }
+    if (data.valor_carga && Number(data.valor_carga) <= 0) {
+      errors.push('Valor de la carga debe ser mayor a 0');
+    }
+    if (data.fecha_inicio_viaje && data.fecha_fin_viaje &&
+        new Date(data.fecha_fin_viaje) < new Date(data.fecha_inicio_viaje)) {
+      errors.push('Fecha de fin no puede ser anterior a la de inicio');
+    }
+    return errors;
+  }
+
+  function showError(msg) {
+    $('error-area').innerHTML = `
+      <div class="error-banner">
+        <span class="material-symbols-outlined">error</span>
+        <span>${msg}</span>
+      </div>`;
+  }
+  function clearError() { $('error-area').innerHTML = ''; }
+  function showSuccess(msg) {
+    $('success-area').innerHTML = `
+      <div class="success-banner">
+        <span class="material-symbols-outlined">check_circle</span>
+        <span>${msg}</span>
+      </div>`;
+    $('success-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ─── Calcular cotización ───
+  async function handleCotizar() {
+    clearError();
+    $('success-area').innerHTML = '';
+    const data = getFormData();
+    const errors = validateForm(data);
+    if (errors.length) {
+      showError(errors[0]);
+      return;
+    }
+
+    const session = TrygerAuth.getSession();
+    if (!session) {
+      showError('Sesión expirada. Vuelve a iniciar sesión.');
+      return;
+    }
+
+    setBtnLoading(true);
+
+    try {
+      const result = await TrygerAPI.createLeadAndQuote({
+        agent_id: session.agent_id,
+        nombre_prospecto: data.nombre_prospecto,
+        telefono: data.telefono,
+        email: data.email,
+        empresa: data.empresa,
+        origen_viaje: data.origen_viaje,
+        destino_viaje: data.destino_viaje,
+        kilometros: Number(data.kilometros),
+        duracion_horas: Number(data.duracion_horas) || 0,
+        fecha_inicio_viaje: data.fecha_inicio_viaje,
+        fecha_fin_viaje: data.fecha_fin_viaje,
+        tipo_vehiculo: data.tipo_vehiculo,
+        tipo_carga: data.tipo_carga,
+        descripcion_carga: data.descripcion_carga,
+        valor_carga: Number(data.valor_carga)
+      });
+
+      if (!result || !result.success) {
+        showError('No se pudo generar la cotización: ' + (result && result.error ? result.error : 'error desconocido'));
+        return;
+      }
+
+      lastQuoteResult = result;
+      renderResult(result, data);
+    } catch (err) {
+      showError('Error de conexión: ' + err.message);
+    } finally {
+      setBtnLoading(false);
+    }
+  }
+
+  function setBtnLoading(loading) {
+    const btn = $('btn-cotizar');
+    if (loading) {
+      btn.disabled = true;
+      btn.style.opacity = '.7';
+      $('btn-cotizar-txt').textContent = 'Calculando...';
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      $('btn-cotizar-txt').textContent = 'Recalcular cotización';
+    }
+  }
+
+  // ─── Render del resultado ───
+  function renderResult(result, formData) {
+    const validezDate = new Date();
+    validezDate.setDate(validezDate.getDate() + (result.validez_dias || 7));
+    const validezStr = TrygerUtils.shortDate(validezDate, true);
+
+    const col = $('result-column');
+    col.classList.add('has-result');
+    col.innerHTML = `
+      <div class="result-card">
+        <div class="result-eyebrow">
+          <span class="material-symbols-outlined">verified</span>
+          Prima calculada
+        </div>
+        <div class="result-title">Cotización ${result.cotizacion_id || ''}</div>
+        <div class="result-prima mono">
+          ${TrygerUtils.money(result.prima_calculada, { decimals: 0 })}<span class="currency">MXN</span>
+        </div>
+
+        <div class="result-meta">
+          <div class="result-meta-item">
+            <div class="label">Tu comisión estimada</div>
+            <div class="value">${TrygerUtils.money(result.comision_estimada, { decimals: 0 })}</div>
+          </div>
+          <div class="result-meta-item">
+            <div class="label">Validez</div>
+            <div class="value">${result.validez_dias || 7} días</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section-card">
+        <div class="card-head"><div class="card-title">Resumen del viaje</div></div>
+        <div style="padding: 0 22px 18px;">
+          <div class="summary-row">
+            <div class="summary-item">
+              <span class="summary-label">Prospecto</span>
+              <span class="summary-value">${formData.nombre_prospecto}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Teléfono</span>
+              <span class="summary-value">${formData.telefono}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Trayecto</span>
+              <span class="summary-value">${formData.origen_viaje} → ${formData.destino_viaje}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Distancia</span>
+              <span class="summary-value">${formData.kilometros} km</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Vehículo</span>
+              <span class="summary-value">${vehiculoLabel(formData.tipo_vehiculo)}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Mercancía</span>
+              <span class="summary-value">${mercanciaLabel(formData.tipo_carga)}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Valor carga</span>
+              <span class="summary-value">${TrygerUtils.money(Number(formData.valor_carga))}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Vigencia</span>
+              <span class="summary-value">${formData.fecha_inicio_viaje} → ${formData.fecha_fin_viaje}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn btn-primary" id="btn-enviar" type="button" style="flex: 1;">
+          <span class="material-symbols-outlined">send</span>
+          <span id="btn-enviar-txt">Enviar a revisión</span>
+        </button>
+      </div>
+      <div style="margin-top: 8px; font-size: 11.5px; color: var(--text-muted); text-align: center;">
+        Al enviar a revisión, se crea una póliza pendiente que el equipo de Tryger validará.
+      </div>
+    `;
+
+    $('btn-enviar').addEventListener('click', handleEnviarRevision);
+  }
+
+  function vehiculoLabel(v) {
+    const map = { tractocamion: 'Tractocamión', caja_seca: 'Caja seca', plataforma: 'Plataforma', camioneta: 'Camioneta', otro: 'Otro' };
+    return map[v] || v;
+  }
+  function mercanciaLabel(m) {
+    const map = { maquinaria: 'Maquinaria', electronica: 'Electrónica', alimentos: 'Alimentos', textiles: 'Textiles', quimicos: 'Químicos', materiales_construccion: 'Materiales de construcción', otros: 'Otros' };
+    return map[m] || m;
+  }
+
+  // ─── Enviar a revisión ───
+  async function handleEnviarRevision() {
+    if (!lastQuoteResult || !lastQuoteResult.cotizacion_id) return;
+
+    const btn = $('btn-enviar');
+    const txt = $('btn-enviar-txt');
+    btn.disabled = true;
+    btn.style.opacity = '.7';
+    txt.textContent = 'Enviando...';
+
+    try {
+      const result = await TrygerAPI.submitQuoteForReview(lastQuoteResult.cotizacion_id);
+      if (!result || !result.success) {
+        showError('No se pudo enviar a revisión: ' + (result && result.error ? result.error : 'error desconocido'));
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        txt.textContent = 'Enviar a revisión';
+        return;
+      }
+      showSuccess(`<strong>¡Listo!</strong> La cotización ${lastQuoteResult.cotizacion_id} se envió a revisión. Se creó la póliza ${result.poliza_id} con estatus "En revisión".`);
+      txt.textContent = 'Enviada ✓';
+      btn.style.background = 'var(--tryger-green-dark)';
+    } catch (err) {
+      showError('Error de conexión: ' + err.message);
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      txt.textContent = 'Enviar a revisión';
+    }
+  }
+
+  // ─── Limpiar formulario ───
+  function handleClear() {
+    if (!confirm('¿Limpiar todos los campos?')) return;
+    document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(el => { el.value = ''; });
+    clearError();
+    $('success-area').innerHTML = '';
+    lastQuoteResult = null;
+    const col = $('result-column');
+    col.classList.remove('has-result');
+    col.innerHTML = `
+      <div class="card section-card" id="result-empty">
+        <div class="pre-result-msg">
+          <span class="material-symbols-outlined">request_quote</span>
+          <strong>Captura los datos del viaje</strong><br>
+          y aquí aparecerá la prima calculada y el resumen.
+        </div>
+      </div>`;
+    $('btn-cotizar-txt').textContent = 'Calcular cotización';
+  }
+
+  // ─── Init ───
+  document.addEventListener('layout:ready', () => {
+    $('btn-cotizar').addEventListener('click', handleCotizar);
+    $('btn-clear').addEventListener('click', handleClear);
+
+    // Pre-llenar fechas con hoy y mañana como sugerencia
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    $('f-fecha-inicio').value = today.toISOString().slice(0, 10);
+    $('f-fecha-fin').value = tomorrow.toISOString().slice(0, 10);
+  });
+})();
+</script>
+</body>
+</html>
