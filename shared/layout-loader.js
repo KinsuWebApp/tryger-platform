@@ -1,7 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
-   TRYGER · LAYOUT HELPER (v5 — sin fetch)
-   Configura sidebar/topbar que YA están inline en cada página.
-   No hay carga asíncrona, no hay fetch, no puede fallar.
+   TRYGER · LAYOUT HELPER (v6 — con soporte móvil)
+   - Configura sidebar/topbar (que ya están inline en cada página).
+   - Inyecta y maneja el menú hamburguesa para mobile.
+   - Cierra el sidebar al hacer clic en cualquier nav-item o backdrop.
    ═══════════════════════════════════════════════════════════════ */
 
 (function() {
@@ -26,7 +27,6 @@
     const section = document.body.dataset.crumbSection;
     const page = document.body.dataset.crumbPage;
     if (section) {
-      // Selector específico: span del breadcrumb, NO el body que también tiene el atributo
       const el = document.querySelector('span[data-crumb-section]');
       if (el) el.textContent = section;
     }
@@ -61,10 +61,80 @@
     document.querySelectorAll('[data-user-role]').forEach(function(el) { el.textContent = user.rol || 'Agente · Activo'; });
   }
 
+  // ─── MOBILE MENU ───
+  function setupMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // 1. Crear botón hamburguesa en el topbar (si la página tiene topbar)
+    const topbar = document.querySelector('.topbar');
+    if (topbar && !topbar.querySelector('.topbar-burger')) {
+      const burger = document.createElement('button');
+      burger.className = 'topbar-burger';
+      burger.setAttribute('aria-label', 'Abrir menú');
+      burger.innerHTML = '<span class="material-symbols-outlined">menu</span>';
+      topbar.insertBefore(burger, topbar.firstChild);
+    }
+
+    // 2. Crear botón de cierre dentro del sidebar
+    if (!sidebar.querySelector('.sidebar-close')) {
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'sidebar-close';
+      closeBtn.setAttribute('aria-label', 'Cerrar menú');
+      closeBtn.innerHTML = '<span class="material-symbols-outlined">close</span>';
+      sidebar.insertBefore(closeBtn, sidebar.firstChild);
+    }
+
+    // 3. Crear backdrop (si no existe)
+    let backdrop = document.querySelector('.sidebar-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.className = 'sidebar-backdrop';
+      document.body.appendChild(backdrop);
+    }
+
+    // 4. Listeners
+    function open() {
+      sidebar.classList.add('open');
+      backdrop.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function close() {
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    const burgerBtn = topbar && topbar.querySelector('.topbar-burger');
+    const closeBtn = sidebar.querySelector('.sidebar-close');
+
+    if (burgerBtn) burgerBtn.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
+
+    // Cerrar al hacer clic en cualquier nav-item (en mobile, no en desktop)
+    sidebar.querySelectorAll('.nav-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        if (window.innerWidth <= 860) close();
+      });
+    });
+
+    // Cerrar con tecla Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && sidebar.classList.contains('open')) close();
+    });
+
+    // Si redimensionan a desktop, cerrar drawer
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 860 && sidebar.classList.contains('open')) close();
+    });
+  }
+
   function bootstrap() {
     configureSidebar();
     configureBreadcrumb();
     configureUser();
+    setupMobileMenu();
     document.dispatchEvent(new CustomEvent('layout:ready'));
   }
 
