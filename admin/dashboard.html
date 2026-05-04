@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Operaciones · Tryger Admin</title>
+
+<link rel="stylesheet" href="../shared/design-system.css" />
+<link rel="stylesheet" href="../shared/components.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+<style>
+/* ═══════ ESTILOS ESPECÍFICOS DEL ADMIN ═══════ */
+
+/* Sidebar admin: fondo aún más oscuro y label distinta */
+.sidebar.is-admin {
+  background: #06121f;
+}
+.sidebar.is-admin::after {
+  background: radial-gradient(circle, rgba(212,81,109,.14) 0%, transparent 65%);
+}
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  background: rgba(212,81,109,.18);
+  color: #ff7d97;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+/* Tabs principales (Vista global / Por agente) */
+.admin-tabs {
+  display: inline-flex;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+  margin-bottom: 24px;
+}
+.admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  white-space: nowrap;
+}
+.admin-tab:hover { color: var(--text-primary); }
+.admin-tab.active {
+  background: var(--tryger-navy);
+  color: white;
+}
+.admin-tab .material-symbols-outlined { font-size: 17px; }
+
+/* KPI con trend */
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.kpi-trend.up { color: var(--tryger-green-dark); background: rgba(130,209,75,.12); }
+.kpi-trend.down { color: var(--tryger-rose); background: rgba(212,81,109,.10); }
+.kpi-trend.neutral { color: var(--text-muted); background: var(--bg-app); }
+.kpi-trend .material-symbols-outlined { font-size: 13px; }
+
+.kpi-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Bandeja de pendientes con énfasis */
+.pendientes-card {
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--tryger-amber);
+}
+.pendientes-card .card-head {
+  background: linear-gradient(to right, rgba(245,158,11,.04), transparent 60%);
+}
+.pendientes-pill {
+  background: rgba(245,158,11,.14);
+  color: #b07208;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 99px;
+  margin-left: auto;
+}
+
+.pendiente-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: background .1s;
+}
+.pendiente-item:hover { background: var(--bg-soft); }
+.pendiente-item:last-child { border-bottom: none; }
+.pendiente-id {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: .02em;
+  width: 80px;
+  flex-shrink: 0;
+}
+.pendiente-route {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+}
+.pendiente-route .arrow {
+  color: var(--text-faint);
+  margin: 0 6px;
+}
+.pendiente-amount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+  width: 100px;
+  flex-shrink: 0;
+}
+.pendiente-agent {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--tryger-blue);
+  background: rgba(21,101,192,.08);
+  padding: 3px 8px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+.pendiente-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  width: 70px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.pendiente-arrow {
+  color: var(--text-faint);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Top agentes ranking */
+.ranking-list {
+  padding: 8px 0 16px;
+}
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 22px;
+  transition: background .1s;
+}
+.rank-item:hover { background: var(--bg-soft); }
+.rank-pos {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-faint);
+  width: 24px;
+}
+.rank-item:nth-child(1) .rank-pos { color: #d4a017; }
+.rank-item:nth-child(2) .rank-pos { color: #8a8a8a; }
+.rank-item:nth-child(3) .rank-pos { color: #b07b3a; }
+.rank-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tryger-blue) 0%, var(--tryger-cyan) 100%);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+.rank-info { flex: 1; min-width: 0; }
+.rank-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rank-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.rank-amount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.rank-bar {
+  height: 4px;
+  background: var(--bg-app);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 4px 22px 0;
+}
+.rank-bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--tryger-blue), var(--tryger-cyan));
+  border-radius: 2px;
+  transition: width .5s ease;
+}
+
+/* Pipeline horizontal stages */
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  padding: 12px 22px 22px;
+  background: var(--border-light);
+  border-radius: 12px;
+  margin: 0 22px 16px;
+  overflow: hidden;
+}
+.pipeline-stage {
+  background: white;
+  padding: 16px 12px;
+  text-align: center;
+  position: relative;
+}
+.pipeline-stage:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid var(--border-light);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  z-index: 2;
+}
+.pipeline-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+.pipeline-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.pipeline-stage.s-revision .pipeline-value { color: var(--tryger-amber); }
+.pipeline-stage.s-cotizacion .pipeline-value { color: var(--tryger-blue); }
+.pipeline-stage.s-emitir .pipeline-value { color: var(--tryger-amber); }
+.pipeline-stage.s-emitida .pipeline-value { color: var(--tryger-green-dark); }
+.pipeline-stage.s-pagar .pipeline-value { color: var(--tryger-amber); }
+.pipeline-stage.s-pagada .pipeline-value { color: var(--tryger-green-dark); }
+
+/* Timeline (actividad) */
+.timeline {
+  position: relative;
+  padding: 8px 22px 16px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 33px;
+  top: 18px;
+  bottom: 22px;
+  width: 1px;
+  background: var(--border-light);
+}
+.timeline-item {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding: 10px 0;
+}
+.timeline-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 2;
+  position: relative;
+}
+.timeline-dot .material-symbols-outlined {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.timeline-item.t-quote .timeline-dot { border-color: var(--tryger-blue); background: rgba(21,101,192,.06); }
+.timeline-item.t-quote .material-symbols-outlined { color: var(--tryger-blue); }
+.timeline-item.t-issued .timeline-dot { border-color: var(--tryger-green); background: rgba(130,209,75,.10); }
+.timeline-item.t-issued .material-symbols-outlined { color: var(--tryger-green-dark); }
+.timeline-item.t-paid .timeline-dot { border-color: var(--tryger-green); background: rgba(130,209,75,.10); }
+.timeline-item.t-paid .material-symbols-outlined { color: var(--tryger-green-dark); }
+.timeline-item.t-cancel .timeline-dot { border-color: var(--tryger-rose); background: rgba(212,81,109,.08); }
+.timeline-item.t-cancel .material-symbols-outlined { color: var(--tryger-rose); }
+.timeline-item.t-visit .timeline-dot { border-color: var(--text-faint); }
+.timeline-content {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+}
+.timeline-text {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+.timeline-text strong { font-weight: 600; }
+.timeline-text .ag-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: var(--bg-app);
+  color: var(--tryger-blue);
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.timeline-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Selector de agente para vista por agente */
+.agent-selector {
+  margin-bottom: 24px;
+  padding: 18px 22px;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.agent-selector-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--text-muted);
+}
+.agent-pill-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.agent-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-app);
+  border: 1px solid transparent;
+  border-radius: 99px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background .1s, border-color .1s, color .1s;
+}
+.agent-pill:hover {
+  background: white;
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+.agent-pill.active {
+  background: var(--tryger-navy);
+  color: white;
+  border-color: var(--tryger-navy);
+}
+.agent-pill .pill-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tryger-blue) 0%, var(--tryger-cyan) 100%);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9.5px; font-weight: 700;
+}
+.agent-pill .pill-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: .7;
+}
+
+/* Hero del agente seleccionado */
+.agent-hero {
+  background: linear-gradient(135deg, #0d1c2e 0%, #1a3050 100%);
+  color: white;
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.agent-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 16px 16px;
+  pointer-events: none;
+}
+.agent-hero-row {
+  position: relative; z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.agent-hero-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tryger-blue) 0%, var(--tryger-cyan) 100%);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700;
+  flex-shrink: 0;
+}
+.agent-hero-info { flex: 1; min-width: 0; }
+.agent-hero-name {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.4px;
+  margin-bottom: 4px;
+}
+.agent-hero-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: rgba(255,255,255,.65);
+}
+.agent-hero-meta .mono {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--tryger-green);
+}
+.agent-hero-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.agent-hero-actions .btn {
+  height: 36px;
+  font-size: 12.5px;
+  background: rgba(255,255,255,.10);
+  color: white;
+  border: 1px solid rgba(255,255,255,.18);
+}
+.agent-hero-actions .btn:hover {
+  background: rgba(255,255,255,.18);
+}
+
+/* Mini KPIs del agente */
+.mini-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.mini-kpi {
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.mini-kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.mini-kpi-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.mini-kpi-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Tag de mock */
+.mock-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(245,158,11,.08);
+  border: 1px solid rgba(245,158,11,.25);
+  border-radius: 10px;
+  font-size: 12px;
+  color: #b07208;
+  margin-bottom: 20px;
+}
+.mock-banner .material-symbols-outlined { font-size: 16px; }
+
+/* Hide */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+@media (max-width: 1024px) {
+  .pipeline-grid { grid-template-columns: repeat(3, 1fr); }
+  .pipeline-stage:nth-child(3)::after { display: none; }
+  .mini-kpis { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .pendiente-item { flex-wrap: wrap; gap: 8px 12px; }
+  .pendiente-id { width: auto; }
+  .pendiente-amount { width: auto; text-align: left; }
+  .pendiente-time { width: auto; text-align: left; }
+  .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
+  .pipeline-stage:nth-child(2)::after { display: none; }
+}
+</style>
+</head>
+
+<body data-active="dashboard"
+      data-crumb-section="Operaciones"
+      data-crumb-page="Dashboard">
+
+<div class="app">
+
+  <!-- ═══ SIDEBAR ADMIN ═══ -->
+  <aside class="sidebar is-admin">
+    <div class="sidebar-logo">
+      Tryger
+      <span class="admin-badge">Admin</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Operación</div>
+      <a href="#" class="nav-item active" data-nav="dashboard">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-nav="pendientes">
+        <span class="material-symbols-outlined">inbox</span>
+        <span>Pendientes</span>
+        <span class="nav-badge danger">7</span>
+      </a>
+      <a href="#" class="nav-item" data-nav="polizas">
+        <span class="material-symbols-outlined">shield</span>
+        <span>Pólizas</span>
+      </a>
+      <a href="#" class="nav-item" data-nav="comisiones">
+        <span class="material-symbols-outlined">payments</span>
+        <span>Comisiones</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Equipo</div>
+      <a href="#" class="nav-item" data-nav="agentes">
+        <span class="material-symbols-outlined">groups</span>
+        <span>Agentes</span>
+        <span class="nav-badge">12</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Contenido</div>
+      <a href="#" class="nav-item" data-nav="capacitacion">
+        <span class="material-symbols-outlined">school</span>
+        <span>Capacitación</span>
+      </a>
+      <a href="#" class="nav-item" data-nav="materiales">
+        <span class="material-symbols-outlined">folder</span>
+        <span>Materiales</span>
+      </a>
+      <a href="#" class="nav-item" data-nav="tarifario">
+        <span class="material-symbols-outlined">price_check</span>
+        <span>Tarifario</span>
+      </a>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="user-card">
+      <div class="user-avatar">AT</div>
+      <div class="user-info">
+        <div class="user-name">Admin Tryger</div>
+        <div class="user-role">Super admin</div>
+      </div>
+      <span class="material-symbols-outlined">unfold_more</span>
+    </div>
+
+    <div class="sidebar-pb">
+      <span>Powered by</span>
+      <span class="pb-mark">
+        <span class="pb-name">kinsu</span>
+        <span class="pb-chev">›</span>
+      </span>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span data-crumb-section>Operaciones</span>
+        <span class="material-symbols-outlined">chevron_right</span>
+        <span class="crumb-active" data-crumb-page>Dashboard</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="searchbox">
+        <span class="material-symbols-outlined">search</span>
+        <input placeholder="Buscar agente, póliza, prospecto..." />
+        <span class="kbd">⌘K</span>
+      </div>
+      <button class="icon-btn" aria-label="Notificaciones">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="dot-badge"></span>
+      </button>
+      <div class="topbar-divider"></div>
+      <div class="topbar-avatar" title="Mi cuenta">AT</div>
+    </div>
+
+    <div class="content">
+
+      <!-- Banner mock -->
+      <div class="mock-banner">
+        <span class="material-symbols-outlined">visibility</span>
+        <span><strong>Vista preliminar</strong> · Esta es una propuesta visual del dashboard administrativo. Los datos son ilustrativos.</span>
+      </div>
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">
+            Operaciones
+            <span class="live-pulse">EN VIVO</span>
+          </h1>
+          <p class="page-subtitle">Resumen general de toda la operación de agentes Tryger.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-ghost">
+            <span class="material-symbols-outlined">download</span>
+            Exportar reporte
+          </button>
+          <button class="btn btn-primary">
+            <span class="material-symbols-outlined">person_add</span>
+            Alta de agente
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs principales -->
+      <div class="admin-tabs">
+        <div class="admin-tab active" data-tab="global">
+          <span class="material-symbols-outlined">public</span>
+          Vista global
+        </div>
+        <div class="admin-tab" data-tab="por-agente">
+          <span class="material-symbols-outlined">person</span>
+          Por agente
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════
+           TAB 1 · VISTA GLOBAL
+           ════════════════════════════════════════════════════════ -->
+      <div class="tab-content active" data-content="global">
+
+        <!-- KPIs globales -->
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-card-v2">
+            <div class="kpi-icon blue"><span class="material-symbols-outlined">groups</span></div>
+            <div class="kpi-label">Agentes activos</div>
+            <div class="kpi-value mono">12</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend up"><span class="material-symbols-outlined">trending_up</span>+2</span>
+              <span>vs mes anterior</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-card-v2">
+            <div class="kpi-icon cyan"><span class="material-symbols-outlined">request_quote</span></div>
+            <div class="kpi-label">Cotizaciones del mes</div>
+            <div class="kpi-value mono">284</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend up"><span class="material-symbols-outlined">trending_up</span>+18%</span>
+              <span>vs mes anterior</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-card-v2">
+            <div class="kpi-icon rose"><span class="material-symbols-outlined">inbox</span></div>
+            <div class="kpi-label">En revisión hoy</div>
+            <div class="kpi-value mono">7</div>
+            <div class="kpi-meta">
+              <span class="kpi-trend neutral">requieren atención</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-card-v2">
+            <div class="kpi-icon green"><span class="material-symbols-outlined">payments</span></div>
+            <div class="kpi-label">Por pagar a agentes</div>
+            <div class="kpi-value mono">$48,200<span class="suffix">MXN</span></div>
+            <div class="kpi-meta">
+              <span>23 comisiones pendientes</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bandeja de pendientes -->
+        <div class="card pendientes-card" style="margin-bottom: 20px;">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Bandeja de pendientes</div>
+              <div class="card-subtitle">Pólizas que requieren tu validación operativa</div>
+            </div>
+            <span class="pendientes-pill">7 pendientes</span>
+            <a href="#" class="link-action">Ver bandeja →</a>
+          </div>
+          <div>
+            <div class="pendiente-item">
+              <span class="pendiente-id">POL-0091</span>
+              <span class="pendiente-route">CDMX <span class="arrow">→</span> Monterrey · Maquinaria</span>
+              <span class="pendiente-amount">$15,900</span>
+              <span class="pendiente-agent">JP-1024</span>
+              <span class="pendiente-time">hace 18 min</span>
+              <span class="material-symbols-outlined pendiente-arrow">chevron_right</span>
+            </div>
+            <div class="pendiente-item">
+              <span class="pendiente-id">POL-0090</span>
+              <span class="pendiente-route">Guadalajara <span class="arrow">→</span> Tijuana · Electrónica</span>
+              <span class="pendiente-amount">$22,100</span>
+              <span class="pendiente-agent">MR-1025</span>
+              <span class="pendiente-time">hace 1 h</span>
+              <span class="material-symbols-outlined pendiente-arrow">chevron_right</span>
+            </div>
+            <div class="pendiente-item">
+              <span class="pendiente-id">POL-0088</span>
+              <span class="pendiente-route">Querétaro <span class="arrow">→</span> Puebla · Alimentos</span>
+              <span class="pendiente-amount">$6,300</span>
+              <span class="pendiente-agent">CG-1027</span>
+              <span class="pendiente-time">hace 2 h</span>
+              <span class="material-symbols-outlined pendiente-arrow">chevron_right</span>
+            </div>
+            <div class="pendiente-item">
+              <span class="pendiente-id">POL-0087</span>
+              <span class="pendiente-route">León <span class="arrow">→</span> Aguascalientes · Textiles</span>
+              <span class="pendiente-amount">$4,800</span>
+              <span class="pendiente-agent">MR-1025</span>
+              <span class="pendiente-time">hace 3 h</span>
+              <span class="material-symbols-outlined pendiente-arrow">chevron_right</span>
+            </div>
+            <div class="pendiente-item">
+              <span class="pendiente-id">POL-0086</span>
+              <span class="pendiente-route">CDMX <span class="arrow">→</span> Veracruz · Químicos</span>
+              <span class="pendiente-amount">$31,500</span>
+              <span class="pendiente-agent">JP-1024</span>
+              <span class="pendiente-time">hace 5 h</span>
+              <span class="material-symbols-outlined pendiente-arrow">chevron_right</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline global -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Pipeline global de pólizas</div>
+              <div class="card-subtitle">Distribución actual por estatus en todo el sistema</div>
+            </div>
+            <div class="tabs">
+              <span class="tab active">Mes actual</span>
+              <span class="tab">Trimestre</span>
+              <span class="tab">Año</span>
+            </div>
+          </div>
+          <div class="pipeline-grid">
+            <div class="pipeline-stage s-revision">
+              <div class="pipeline-value mono">7</div>
+              <div class="pipeline-label">En revisión</div>
+            </div>
+            <div class="pipeline-stage s-cotizacion">
+              <div class="pipeline-value mono">12</div>
+              <div class="pipeline-label">En cotización</div>
+            </div>
+            <div class="pipeline-stage s-emitir">
+              <div class="pipeline-value mono">9</div>
+              <div class="pipeline-label">Por emitir</div>
+            </div>
+            <div class="pipeline-stage s-emitida">
+              <div class="pipeline-value mono">23</div>
+              <div class="pipeline-label">Emitidas</div>
+            </div>
+            <div class="pipeline-stage s-pagar">
+              <div class="pipeline-value mono">14</div>
+              <div class="pipeline-label">Por pagar</div>
+            </div>
+            <div class="pipeline-stage s-pagada">
+              <div class="pipeline-value mono">87</div>
+              <div class="pipeline-label">Pagadas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top agentes + Actividad global -->
+        <div class="dashboard-row">
+
+          <!-- Top agentes -->
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Top agentes del mes</div>
+                <div class="card-subtitle">Por comisión devengada</div>
+              </div>
+              <a href="#" class="link-action">Ver todos →</a>
+            </div>
+            <div class="ranking-list">
+              <div class="rank-item">
+                <span class="rank-pos">1</span>
+                <div class="rank-avatar">JP</div>
+                <div class="rank-info">
+                  <div class="rank-name">Juan Pérez García</div>
+                  <div class="rank-code">JP-1024</div>
+                </div>
+                <div class="rank-amount mono">$12,450</div>
+              </div>
+              <div class="rank-bar"><div class="rank-bar-fill" style="width: 100%;"></div></div>
+
+              <div class="rank-item">
+                <span class="rank-pos">2</span>
+                <div class="rank-avatar">MR</div>
+                <div class="rank-info">
+                  <div class="rank-name">María Ramírez López</div>
+                  <div class="rank-code">MR-1025</div>
+                </div>
+                <div class="rank-amount mono">$8,920</div>
+              </div>
+              <div class="rank-bar"><div class="rank-bar-fill" style="width: 71%;"></div></div>
+
+              <div class="rank-item">
+                <span class="rank-pos">3</span>
+                <div class="rank-avatar">CG</div>
+                <div class="rank-info">
+                  <div class="rank-name">Carlos González Mejía</div>
+                  <div class="rank-code">CG-1027</div>
+                </div>
+                <div class="rank-amount mono">$6,310</div>
+              </div>
+              <div class="rank-bar"><div class="rank-bar-fill" style="width: 50%;"></div></div>
+
+              <div class="rank-item">
+                <span class="rank-pos">4</span>
+                <div class="rank-avatar">LV</div>
+                <div class="rank-info">
+                  <div class="rank-name">Laura Vega Martínez</div>
+                  <div class="rank-code">LV-1031</div>
+                </div>
+                <div class="rank-amount mono">$4,780</div>
+              </div>
+              <div class="rank-bar"><div class="rank-bar-fill" style="width: 38%;"></div></div>
+
+              <div class="rank-item">
+                <span class="rank-pos">5</span>
+                <div class="rank-avatar">AS</div>
+                <div class="rank-info">
+                  <div class="rank-name">Andrés Soto Torres</div>
+                  <div class="rank-code">AS-1029</div>
+                </div>
+                <div class="rank-amount mono">$3,210</div>
+              </div>
+              <div class="rank-bar"><div class="rank-bar-fill" style="width: 26%;"></div></div>
+            </div>
+          </div>
+
+          <!-- Actividad global -->
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Actividad global</div>
+                <div class="card-subtitle">Últimas 24 horas</div>
+              </div>
+            </div>
+            <div class="timeline">
+              <div class="timeline-item t-paid">
+                <div class="timeline-dot"><span class="material-symbols-outlined">payments</span></div>
+                <div class="timeline-content">
+                  <div class="timeline-text"><strong>POL-0089</strong> pagada <span class="ag-pill">JP-1024</span></div>
+                  <div class="timeline-time">hace 8 min</div>
+                </div>
+              </div>
+              <div class="timeline-item t-quote">
+                <div class="timeline-dot"><span class="material-symbols-outlined">request_quote</span></div>
+                <div class="timeline-content">
+                  <div class="timeline-text">Pedro Gómez cotizó CDMX→Querétaro · $3,610 <span class="ag-pill">JP-1024</span></div>
+                  <div class="timeline-time">hace 18 min</div>
+                </div>
+              </div>
+              <div class="timeline-item t-issued">
+                <div class="timeline-dot"><span class="material-symbols-outlined">shield</span></div>
+                <div class="timeline-content">
+                  <div class="timeline-text"><strong>POL-0085</strong> emitida <span class="ag-pill">MR-1025</span></div>
+                  <div class="timeline-time">hace 42 min</div>
+                </div>
+              </div>
+              <div class="timeline-item t-quote">
+                <div class="timeline-dot"><span class="material-symbols-outlined">request_quote</span></div>
+                <div class="timeline-content">
+                  <div class="timeline-text">Nueva cotización · Logística Tlaxcala · $14,200 <span class="ag-pill">CG-1027</span></div>
+                  <div class="timeline-time">hace 1 h</div>
+                </div>
+              </div>
+              <div class="timeline-item t-visit">
+                <div class="timeline-dot"><span class="material-symbols-outlined">forum</span></div>
+                <div class="timeline-content">
+                  <div class="timeline-text">Visita a /cotizacion sin código → asignado a HOUSE</div>
+                  <div class="timeline-time">hace 2 h</div>
+                </div>
+              </div>
+              <div class="timeline-item t-issued">
+                <div class="timeline-dot"><span class="material-symbols-outlined">shield</span></div>
+                <div class="timeline-content">
+                  <div class="timeline-text"><strong>POL-0083</strong> emitida <span class="ag-pill">JP-1024</span></div>
+                  <div class="timeline-time">hace 3 h</div>
+                </div>
+              </div>
+              <div class="timeline-item t-cancel">
+                <div class="timeline-dot"><span class="material-symbols-outlined">cancel</span></div>
+                <div class="timeline-content">
+                  <div class="timeline-text"><strong>POL-0078</strong> cancelada · cliente arrepentido <span class="ag-pill">MR-1025</span></div>
+                  <div class="timeline-time">hace 5 h</div>
+                </div>
+              </div>
+              <div class="timeline-item t-paid">
+                <div class="timeline-dot"><span class="material-symbols-outlined">payments</span></div>
+                <div class="timeline-content">
+                  <div class="timeline-text"><strong>POL-0080</strong> pagada <span class="ag-pill">LV-1031</span></div>
+                  <div class="timeline-time">hace 7 h</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════
+           TAB 2 · POR AGENTE
+           ════════════════════════════════════════════════════════ -->
+      <div class="tab-content" data-content="por-agente">
+
+        <!-- Selector de agente -->
+        <div class="agent-selector">
+          <div class="agent-selector-label">Agente:</div>
+          <div class="agent-pill-list">
+            <div class="agent-pill active">
+              <div class="pill-avatar">JP</div>
+              Juan Pérez
+              <span class="pill-code">JP-1024</span>
+            </div>
+            <div class="agent-pill">
+              <div class="pill-avatar">MR</div>
+              María Ramírez
+              <span class="pill-code">MR-1025</span>
+            </div>
+            <div class="agent-pill">
+              <div class="pill-avatar">CG</div>
+              Carlos González
+              <span class="pill-code">CG-1027</span>
+            </div>
+            <div class="agent-pill">
+              <div class="pill-avatar">LV</div>
+              Laura Vega
+              <span class="pill-code">LV-1031</span>
+            </div>
+            <div class="agent-pill">
+              <div class="pill-avatar">AS</div>
+              Andrés Soto
+              <span class="pill-code">AS-1029</span>
+            </div>
+            <div class="agent-pill">
+              <span class="material-symbols-outlined" style="font-size: 16px;">expand_more</span>
+              Ver más (7)
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero del agente -->
+        <div class="agent-hero">
+          <div class="agent-hero-row">
+            <div class="agent-hero-avatar">JP</div>
+            <div class="agent-hero-info">
+              <div class="agent-hero-name">Juan Pérez García</div>
+              <div class="agent-hero-meta">
+                <span><span class="mono">JP-1024</span></span>
+                <span>juan.perez@tryger.com · 5512345678</span>
+                <span>Activo · Alta hace 90 días</span>
+              </div>
+            </div>
+            <div class="agent-hero-actions">
+              <button class="btn">
+                <span class="material-symbols-outlined">edit</span>
+                Editar
+              </button>
+              <button class="btn">
+                <span class="material-symbols-outlined">block</span>
+                Pausar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini KPIs del agente -->
+        <div class="mini-kpis">
+          <div class="mini-kpi">
+            <div class="mini-kpi-label">Cotizaciones (mes)</div>
+            <div class="mini-kpi-value mono">28</div>
+            <div class="mini-kpi-sub">
+              <span class="kpi-trend up" style="display:inline-flex;"><span class="material-symbols-outlined">trending_up</span>+22%</span>
+              vs mes anterior
+            </div>
+          </div>
+          <div class="mini-kpi">
+            <div class="mini-kpi-label">Pólizas pagadas</div>
+            <div class="mini-kpi-value mono">7</div>
+            <div class="mini-kpi-sub">25% conversión</div>
+          </div>
+          <div class="mini-kpi">
+            <div class="mini-kpi-label">Comisión devengada</div>
+            <div class="mini-kpi-value mono">$12,450</div>
+            <div class="mini-kpi-sub">$2,100 por cobrar</div>
+          </div>
+          <div class="mini-kpi">
+            <div class="mini-kpi-label">Última actividad</div>
+            <div class="mini-kpi-value mono" style="font-size: 16px;">hace 18 min</div>
+            <div class="mini-kpi-sub">Cotización CDMX→Qro.</div>
+          </div>
+        </div>
+
+        <!-- Funnel del agente -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Funnel de Juan Pérez</div>
+              <div class="card-subtitle">Últimos 30 días</div>
+            </div>
+            <div class="tabs">
+              <span class="tab active">30 días</span>
+              <span class="tab">90 días</span>
+              <span class="tab">Año</span>
+            </div>
+          </div>
+          <div class="funnel">
+            <div class="funnel-step s1">
+              <div class="funnel-value mono">28</div>
+              <div class="funnel-label">Cotizaciones</div>
+            </div>
+            <div class="funnel-step s2">
+              <div class="funnel-value mono">9</div>
+              <div class="funnel-label">Pólizas emitidas</div>
+            </div>
+            <div class="funnel-step s3">
+              <div class="funnel-value mono">7</div>
+              <div class="funnel-label">Pólizas pagadas</div>
+            </div>
+            <div class="funnel-step s4">
+              <div class="funnel-value mono">2</div>
+              <div class="funnel-label">Pólizas canceladas</div>
+            </div>
+          </div>
+          <div class="funnel-stats">
+            <div class="funnel-stat">
+              <div class="funnel-stat-value mono">32.1%</div>
+              <div class="funnel-stat-label">Cotizaciones a emitidas</div>
+            </div>
+            <div class="funnel-stat">
+              <div class="funnel-stat-value mono">77.7%</div>
+              <div class="funnel-stat-label">Emitidas a pagadas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de pólizas del agente -->
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Pólizas de Juan Pérez</div>
+            </div>
+            <a href="#" class="link-action">Ver todas →</a>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Póliza</th>
+                  <th>Prospecto</th>
+                  <th>Trayecto</th>
+                  <th>Estatus</th>
+                  <th class="num">Prima</th>
+                  <th class="num">Comisión</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong class="mono">POL-0089</strong></td>
+                  <td>Carlos Ramírez</td>
+                  <td>CDMX → GDL</td>
+                  <td><span class="status-dot green">Pagada</span></td>
+                  <td class="num">$8,500</td>
+                  <td class="num">$850</td>
+                  <td>hace 3 días</td>
+                </tr>
+                <tr>
+                  <td><strong class="mono">POL-0091</strong></td>
+                  <td>Pedro Gómez</td>
+                  <td>CDMX → MTY</td>
+                  <td><span class="status-dot amber">En revisión</span></td>
+                  <td class="num">$15,900</td>
+                  <td class="num commission-pending">—</td>
+                  <td>hoy</td>
+                </tr>
+                <tr>
+                  <td><strong class="mono">POL-0085</strong></td>
+                  <td>Roberto Sánchez</td>
+                  <td>León → CDMX</td>
+                  <td><span class="status-dot green">Emitida</span></td>
+                  <td class="num">$12,300</td>
+                  <td class="num">$1,230</td>
+                  <td>hace 5 días</td>
+                </tr>
+                <tr>
+                  <td><strong class="mono">POL-0086</strong></td>
+                  <td>Luis Hernández</td>
+                  <td>CDMX → Veracruz</td>
+                  <td><span class="status-dot amber">En revisión</span></td>
+                  <td class="num">$31,500</td>
+                  <td class="num commission-pending">—</td>
+                  <td>hoy</td>
+                </tr>
+                <tr>
+                  <td><strong class="mono">POL-0078</strong></td>
+                  <td>Ana López</td>
+                  <td>Querétaro → MTY</td>
+                  <td><span class="status-dot green">Pagada</span></td>
+                  <td class="num">$7,200</td>
+                  <td class="num">$720</td>
+                  <td>hace 28 días</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Layout loader (solo para hamburguesa móvil + breadcrumb) -->
+<script>
+  // Sin auth check para que se pueda mostrar al cliente sin login
+  window.AUTH_CHECK_ENABLED = false;
+</script>
+<script src="../shared/layout-loader.js"></script>
+<script>
+// Switch entre tabs
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    document.querySelector(`.tab-content[data-content="${target}"]`).classList.add('active');
+  });
+});
+
+// Switch entre agentes (tab 2)
+document.querySelectorAll('.agent-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.agent-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    // En el draft solo cambia visualmente; los datos del hero se quedan iguales
+  });
+});
+</script>
+</body>
+</html>
